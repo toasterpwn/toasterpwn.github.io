@@ -3,7 +3,7 @@ tags = ["ctf","crypto","integer-handling"]
 categories = ["CTF Writeups", "Cryptography"] 
 date = "2023-1-6" 
 description = "An easy 'crypto' challenge where we can trick a casino into adding to our balance by betting a negative amount of money." 
-title = "TetCTF 2022: casino"
+title = "TetCTF 2023: casino"
 +++
 
 # Overview
