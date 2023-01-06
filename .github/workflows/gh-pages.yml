@@ -20,4 +20,3 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
           hugoVersion: 'latest'
-          extended: true
