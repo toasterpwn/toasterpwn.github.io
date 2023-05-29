@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on toasterpwn</title>
+    <link>https://toasterpwn.github.io/tags/</link>
+    <description>Recent content in Tags on toasterpwn</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>toasterpwn</copyright><atom:link href="https://toasterpwn.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ai</title>
+      <link>https://toasterpwn.github.io/tags/ai/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://toasterpwn.github.io/tags/ai/</guid>
+      <description></description>
+      <content></content>
+    </item>
+    
+    <item>
+      <title>chatgpt</title>
+      <link>https://toasterpwn.github.io/tags/chatgpt/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://toasterpwn.github.io/tags/chatgpt/</guid>
+      <description></description>
+      <content></content>
+    </item>
+    
+    <item>
+      <title>crypto</title>
+      <link>https://toasterpwn.github.io/tags/crypto/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://toasterpwn.github.io/tags/crypto/</guid>
+      <description></description>
+      <content></content>
+    </item>
+    
+    <item>
+      <title>ctf</title>
+      <link>https://toasterpwn.github.io/tags/ctf/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://toasterpwn.github.io/tags/ctf/</guid>
+      <description></description>
+      <content></content>
+    </item>
+    
+    <item>
+      <title>defcon</title>
+      <link>https://toasterpwn.github.io/tags/defcon/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://toasterpwn.github.io/tags/defcon/</guid>
+      <description></description>
+      <content></content>
+    </item>
+    
+    <item>
+      <title>heap-exploitation</title>
+      <link>https://toasterpwn.github.io/tags/heap-exploitation/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://toasterpwn.github.io/tags/heap-exploitation/</guid>
+      <description></description>
+      <content></content>
+    </item>
+    
+    <item>
+      <title>integer-handling</title>
+      <link>https://toasterpwn.github.io/tags/integer-handling/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://toasterpwn.github.io/tags/integer-handling/</guid>
+      <description></description>
+      <content></content>
+    </item>
+    
+    <item>
+      <title>misc</title>
+      <link>https://toasterpwn.github.io/tags/misc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://toasterpwn.github.io/tags/misc/</guid>
+      <description></description>
+      <content></content>
+    </item>
+    
+    <item>
+      <title>pwn</title>
+      <link>https://toasterpwn.github.io/tags/pwn/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://toasterpwn.github.io/tags/pwn/</guid>
+      <description></description>
+      <content></content>
+    </item>
+    
+    <item>
+      <title>qualifier</title>
+      <link>https://toasterpwn.github.io/tags/qualifier/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://toasterpwn.github.io/tags/qualifier/</guid>
+      <description></description>
+      <content></content>
+    </item>
+    
+  </channel>
+</rss>
