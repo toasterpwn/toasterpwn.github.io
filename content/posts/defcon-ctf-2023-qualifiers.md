@@ -658,5 +658,5 @@ Overall, this challenge was not bad, but a provided libc would've saved us about
 # Reflection
 
 This year, I performed a lot better than I previously had. Last year I solved nothing, which shows how much I have improved by ~~neglecting school~~ playing many CTFs. I felt that by playing in person with my teammates, I had a certain acountability to not get distracted and put all my effort into the challenges, which benefitted me greatly.
-Thank you so much to my teammates, especially [@q3st1on](https://twitter.com/q3st1on) , [@TheSavageTeddy](https://twitter.com/theuwuteddy) and `Quasar` for working on the `Gupta` series with me, and `GoldenBoy`, `Zaffir`, [@4n0nym4u5](https://4n0nym4u5.netlify.app/), `SkrubLawd`, `Ex` for helping with `Open House`.
+Thank you so much to my teammates, especially [@q3st1on](https://twitter.com/q3st1on) , [@TheSavageTeddy](https://twitter.com/theuwuteddy) and `Quasar` for working on the `Gupta` series with me, and `GoldenBoy`, `Zafirr`, [@4n0nym4u5](https://4n0nym4u5.netlify.app/), `SkrubLawd`, `Ex` for helping with `Open House`.
 I hope you enjoyed my writeups, I'll try to more consistently post some content soon!
