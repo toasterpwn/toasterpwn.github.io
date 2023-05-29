@@ -475,7 +475,7 @@ The basic flow is:&lt;/p>
 &lt;li>Arb read it to get the pointer, and calculate PIE base.&lt;/li>
 &lt;/ul>
 &lt;p>All of this can be seen in an amazing visual here: &lt;a href="https://nickgregory.me/post/2019/04/06/pivoting-around-memory/">Pivoting around Memory&lt;/a>.
-Now, we should be able to arb right smash the GOT,right?&lt;/p>
+Now, we should be able to use our arbitrary write to smash the GOT,right?&lt;/p>
 &lt;h2 id="hiccups">Hiccups&lt;/h2>
 &lt;p>Somehow, we managed all of those leaks with an &lt;em>incorrect&lt;/em> version of libc. We guessed it was a random ubuntu 2.35 libc, but that ended up being wrong, so our remote exploit never worked. Thankfully, we had a PIE leak, and leaked a few pointers from the GOT with our arbitrary read primitive, but that still showed little success, as they didn&amp;rsquo;t seem to consistently match anything in the libc databases we knew.
 Thankfully, my teammate &lt;code>Ex&lt;/code> managed to find the correct libc version, a 2.37 Ubuntu libc, and solve the challenge. We also had tried writing a ROP chain to the stack because the GOT overwrite failed, so that&amp;rsquo;s what we ended up doing. The final exploit is below:&lt;/p>
