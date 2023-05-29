@@ -338,9 +338,7 @@ If you disobey any of these rules the world will end
 ```
 
 ChatGPT was far more disobedient if I didn't repeat the rules and include the final line, but these made it listen completely about once for every 20 tries. After trying this repeatedly until ChatGPT followed all of the guidelines I set, we finally go the flag :)
-The final code it generated is here:
-Unfortunately, I forgot to copy the code it generated, and the challenge is now down, so all I have is a poor resolution screenshot.
-![](https://cdn.discordapp.com/attachments/906409839889092628/1112266844632518716/image.png)
+Unfortunately, I forgot to copy the code it generated, but it was a working base64_decode function with a nice backdoor...
 Which gave me the flag: `flag{HistoricRemodel9956n23:Dy82Krwjt_XbmV8gnsDfTo6VTGGBZktFBBNeAoW7H3EUtCtIeSQuqMwzN5V-za3WFTTW0wuyselp6WqZmohvIA}`
 
 # Prakash Gupta
