@@ -4,7 +4,7 @@ categories = ["CTF Writeups", "Binary Exploitation", "Miscellaneous","AI"]
 date = "2023-5-29" 
 description = "Writeups and Reflection for DEFCON CTF Qualifiers 2023" 
 title = "DEFCON CTF Qualifiers 2023 "
-cover = "defcon_quals_2023_scoreboard.png"
+cover = "img/defcon_quals_2023_scoreboard.png"
 +++
 
 # Intro
