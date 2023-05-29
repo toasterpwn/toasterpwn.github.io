@@ -561,7 +561,7 @@ The basic flow is:
 - Find somewhere on the stack with a pointer to somewhere in the program
 - Arb read it to get the pointer, and calculate PIE base.
 
-All of this can be seen in an amazing visual here: [Pivoting around Memory]("https://nickgregory.me/post/2019/04/06/pivoting-around-memory/").
+All of this can be seen in an amazing visual here: [Pivoting around Memory](https://nickgregory.me/post/2019/04/06/pivoting-around-memory/).
 Now, we should be able to arb right smash the GOT,right?
 
 ## Hiccups
