@@ -562,7 +562,7 @@ The basic flow is:
 - Arb read it to get the pointer, and calculate PIE base.
 
 All of this can be seen in an amazing visual here: [Pivoting around Memory](https://nickgregory.me/post/2019/04/06/pivoting-around-memory/).
-Now, we should be able to arb right smash the GOT,right?
+Now, we should be able to use our arbitrary write to smash the GOT,right?
 
 ## Hiccups
 
